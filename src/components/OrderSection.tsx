@@ -1,7 +1,25 @@
 import { Package, Truck, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useOrder } from "@/context/OrderContext";
 
 const OrderSection = () => {
+  const { setOrderType } = useOrder();
+
+  const handleOrderTypeSelect = (type: 'pickup' | 'delivery') => {
+    setOrderType(type);
+
+
+    // Initiate phone call based on order type
+    const phoneNumber = type === 'pickup' ? '+998507250309' : '+998975960976';
+    window.location.href = `tel:${phoneNumber}`;
+
+    // Scroll to menu section
+    const menuSection = document.getElementById('menu');
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <section id="order" className="py-20 bg-cream-dark">
       <div className="container mx-auto px-4">
@@ -29,16 +47,21 @@ const OrderSection = () => {
               Olib Ketish
             </h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Buyurtmangizni tayyorlab qo'yamiz. O'zingiz kelib olib ketasiz. 
+              Buyurtmangizni tayyorlab qo'yamiz. O'zingiz kelib olib ketasiz.
               Tezroq va qulay!
             </p>
             <div className="flex items-center gap-2 text-muted-foreground mb-6">
               <Clock className="w-5 h-5 text-gold" />
               <span>15-20 daqiqa tayyorlanadi</span>
             </div>
-            <Button variant="order" size="lg" className="w-full">
+            <Button
+              variant="order"
+              size="lg"
+              className="w-full"
+              onClick={() => handleOrderTypeSelect('pickup')}
+            >
               <Phone className="w-5 h-5" />
-              +998 71 123 45 67
+              +998 50 725 03 09
             </Button>
           </div>
 
@@ -51,16 +74,21 @@ const OrderSection = () => {
               Yetkazib Berish
             </h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Issiq taomlarni uyingizgacha yetkazib beramiz. 
+              Issiq taomlarni uyingizgacha yetkazib beramiz.
               Qulay va tez xizmat!
             </p>
             <div className="flex items-center gap-2 text-muted-foreground mb-6">
               <Clock className="w-5 h-5 text-primary" />
               <span>30-45 daqiqada yetkazamiz</span>
             </div>
-            <Button variant="order" size="lg" className="w-full">
+            <Button
+              variant="order"
+              size="lg"
+              className="w-full"
+              onClick={() => handleOrderTypeSelect('delivery')}
+            >
               <Phone className="w-5 h-5" />
-              +998 71 123 45 67
+              +998 97 596 09 76
             </Button>
           </div>
         </div>
@@ -72,10 +100,10 @@ const OrderSection = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <span className="text-foreground font-semibold">
-              📍 Toshkent, Chorsu bozori yaqinida
+              📍 Shaxrisabz, Yangi bozor yonida
             </span>
             <span className="text-foreground font-semibold">
-              🕐 Har kuni 08:00 - 22:00
+              🕐 Har kuni 10:00 - 22:00
             </span>
           </div>
         </div>

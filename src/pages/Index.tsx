@@ -43,6 +43,10 @@ const Index = () => {
 
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header cartItemsCount={cartItemsCount} onCartClick={() => setIsCartOpen(true)} />
@@ -58,6 +62,7 @@ const Index = () => {
         items={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
       />
     </div>
   );

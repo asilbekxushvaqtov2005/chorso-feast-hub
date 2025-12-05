@@ -2,7 +2,7 @@ import { ChefHat, Phone, MapPin, Clock, Instagram, Facebook } from "lucide-react
 
 const Footer = () => {
   return (
-    <footer className="bg-burgundy-dark text-cream py-16">
+    <footer className="bg-burgundy-dark text-cream py-16 shadow-2xl">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-12">
           {/* Brand */}
@@ -20,17 +20,17 @@ const Footer = () => {
           <div>
             <h3 className="font-display text-xl font-bold mb-4">Aloqa</h3>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-cream/80">
+              <a href="tel:+998507250309" className="flex items-center gap-3 text-cream/80 hover:text-gold transition-colors">
                 <Phone className="w-5 h-5 text-gold" />
-                <span>+998 71 123 45 67</span>
-              </div>
+                <span>+998 50 725 03 09</span>
+              </a>
               <div className="flex items-center gap-3 text-cream/80">
                 <MapPin className="w-5 h-5 text-gold" />
-                <span>Toshkent, Chorsu bozori yaqinida</span>
+                <span>Shaxrisabz, Yangi bozor yaqinida</span>
               </div>
               <div className="flex items-center gap-3 text-cream/80">
                 <Clock className="w-5 h-5 text-gold" />
-                <span>Har kuni 08:00 - 22:00</span>
+                <span>Har kuni 10:00 - 22:00</span>
               </div>
             </div>
           </div>
@@ -40,7 +40,9 @@ const Footer = () => {
             <h3 className="font-display text-xl font-bold mb-4">Ijtimoiy tarmoqlar</h3>
             <div className="flex gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/070_aslbe"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-12 h-12 bg-cream/10 rounded-full flex items-center justify-center hover:bg-gold transition-colors"
               >
                 <Instagram className="w-6 h-6" />
