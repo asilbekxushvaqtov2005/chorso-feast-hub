@@ -8,7 +8,6 @@ const OrderSection = () => {
   const handleOrderTypeSelect = (type: 'pickup' | 'delivery') => {
     setOrderType(type);
 
-
     // Initiate phone call based on order type
     const phoneNumber = type === 'pickup' ? '+998507250309' : '+998975960976';
     window.location.href = `tel:${phoneNumber}`;
@@ -100,7 +99,7 @@ const OrderSection = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <span className="text-foreground font-semibold">
-              📍 Shaxrisabz, Yangi bozor yonida
+              📍 Shaxrisabz, Yangi bozor yaqinida bozori yaqinida
             </span>
             <span className="text-foreground font-semibold">
               🕐 Har kuni 10:00 - 22:00
