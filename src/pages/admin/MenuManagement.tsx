@@ -157,7 +157,7 @@ const MenuManagement = () => {
                 </Dialog>
             </div>
 
-            <div className="border rounded-md">
+            <div className="border rounded-md bg-white/80 backdrop-blur-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>

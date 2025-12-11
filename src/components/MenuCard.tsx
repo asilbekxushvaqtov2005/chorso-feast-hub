@@ -10,10 +10,27 @@ interface MenuCardProps {
 
 const MenuCard = ({ item, onAddToCart }: MenuCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(
+    item.variants ? item.variants[0] : null
+  );
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("uz-UZ").format(price) + " so'm";
   };
+
+  const handleAddToCart = () => {
+    if (item.variants && selectedVariant) {
+      onAddToCart({
+        ...item,
+        name: `${item.name} (${selectedVariant.name})`,
+        price: selectedVariant.price,
+      });
+    } else {
+      onAddToCart(item);
+    }
+  };
+
+  const currentPrice = selectedVariant ? selectedVariant.price : item.price;
 
   return (
     <div
@@ -26,12 +43,11 @@ const MenuCard = ({ item, onAddToCart }: MenuCardProps) => {
         <img
           src={item.image}
           alt={item.name}
-          className={`w-full h-full object-cover transition-transform duration-700 ${
-            isHovered ? "scale-110" : "scale-100"
-          }`}
+          className={`w-full h-full object-cover transition-transform duration-700 ${isHovered ? "scale-110" : "scale-100"
+            }`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
-        
+
         {/* Category Badge */}
         <span className="absolute top-4 left-4 bg-gold/90 text-foreground px-3 py-1 rounded-full text-xs font-semibold">
           {item.category}
@@ -45,18 +61,37 @@ const MenuCard = ({ item, onAddToCart }: MenuCardProps) => {
             {item.name}
           </h3>
           <span className="text-gold font-bold text-lg">
-            {formatPrice(item.price)}
+            {formatPrice(currentPrice)}
           </span>
         </div>
-        
+
         <p className="text-muted-foreground text-sm mb-5 leading-relaxed">
           {item.description}
         </p>
 
+        {item.variants && (
+          <div className="mb-4">
+            <select
+              className="w-full p-2 rounded-md border border-input bg-background text-sm"
+              value={selectedVariant?.name}
+              onChange={(e) => {
+                const variant = item.variants?.find(v => v.name === e.target.value);
+                if (variant) setSelectedVariant(variant);
+              }}
+            >
+              {item.variants.map((variant) => (
+                <option key={variant.name} value={variant.name}>
+                  {variant.name} - {formatPrice(variant.price)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <Button
           variant="order"
           className="w-full group"
-          onClick={() => onAddToCart(item)}
+          onClick={handleAddToCart}
         >
           <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
           Savatga qo'shish

@@ -38,7 +38,7 @@ const Orders = () => {
         <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">Buyurtmalar</h2>
 
-            <div className="border rounded-md bg-white">
+            <div className="border rounded-md bg-white/80 backdrop-blur-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>

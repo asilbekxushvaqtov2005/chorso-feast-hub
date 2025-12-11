@@ -20,6 +20,7 @@ const Couriers = () => {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
+        telegramChatId: "",
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -30,7 +31,7 @@ const Couriers = () => {
         }
 
         addCourier(formData);
-        setFormData({ name: "", phone: "" });
+        setFormData({ name: "", phone: "", telegramChatId: "" });
         setIsAdding(false);
         toast.success("Kuryer muvaffaqiyatli qo'shildi");
     };
@@ -46,7 +47,7 @@ const Couriers = () => {
             </div>
 
             {isAdding && (
-                <div className="bg-white p-6 rounded-lg shadow-sm border animate-in fade-in slide-in-from-top-4">
+                <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-sm border animate-in fade-in slide-in-from-top-4">
                     <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div className="space-y-2">
                             <Label htmlFor="name">Ism</Label>
@@ -78,26 +79,42 @@ const Couriers = () => {
                                 />
                             </div>
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="chatId">Telegram Chat ID</Label>
+                            <div className="relative">
+                                <Input
+                                    id="chatId"
+                                    placeholder="Masalan: 123456789"
+                                    value={formData.telegramChatId}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, telegramChatId: e.target.value })
+                                    }
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Kuryer <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@userinfobot</a> orqali o'z ID sini olishi mumkin
+                                </p>
+                            </div>
+                        </div>
                         <Button type="submit">Saqlash</Button>
                     </form>
                 </div>
             )}
 
-            <div className="border rounded-md bg-white">
+            <div className="border rounded-md bg-white/80 backdrop-blur-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Ism</TableHead>
                             <TableHead>Telefon</TableHead>
+                            <TableHead>Telegram ID</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Familya</TableHead>
                             <TableHead className="text-right">Amallar</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {couriers.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                     Kuryerlar mavjud emas
                                 </TableCell>
                             </TableRow>
@@ -106,6 +123,7 @@ const Couriers = () => {
                                 <TableRow key={courier.id}>
                                     <TableCell className="font-medium">{courier.name}</TableCell>
                                     <TableCell>{courier.phone}</TableCell>
+                                    <TableCell className="font-mono text-xs">{courier.telegramChatId || '-'}</TableCell>
                                     <TableCell>
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${courier.status === 'active'
                                             ? 'bg-green-100 text-green-800'

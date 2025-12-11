@@ -8,6 +8,7 @@ import { useAdmin } from "@/context/AdminContext";
 import { useOrder } from "@/context/OrderContext";
 import { toast } from "sonner";
 import type { MenuItem } from "@/data/menuData";
+import { sendTelegramMessage, sendTelegramLocation } from "@/lib/telegram";
 
 interface CartItem extends MenuItem {
   quantity: number;
@@ -17,8 +18,8 @@ interface CartProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (id: number, name: string, quantity: number) => void;
+  onRemoveItem: (id: number, name: string) => void;
   onClearCart: () => void;
 }
 
@@ -67,7 +68,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.phone) {
       toast.error("Iltimos, telefon raqamingizni kiriting");
@@ -85,6 +86,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
       return;
     }
 
+    // 1. Save to local Admin Context (for local admin panel)
     addOrder({
       customerName: formData.name,
       phone: formData.phone,
@@ -92,10 +94,44 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
       paymentMethod: formData.paymentMethod,
       items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
       total: totalPrice,
-      deliveryType: orderType || 'pickup', // Default to pickup if not set
+      deliveryType: orderType || 'pickup',
     });
 
-    toast.success("Buyurtmangiz qabul qilindi! Tez orada aloqaga chiqamiz.");
+    // 2. Send to Telegram
+    const orderId = Date.now().toString().slice(-4);
+    const date = new Date().toLocaleString('uz-UZ');
+    const typeText = orderType === 'delivery' ? '🚚 Yetkazib berish' : '🏃 Olib ketish';
+    const paymentText = formData.paymentMethod === 'cash' ? '💵 Naqd' : formData.paymentMethod === 'card' ? '💳 Karta' : '📲 Online';
+
+    let message = `<b>Yangi Buyurtma #${orderId}</b>\n\n`;
+    message += `👤 <b>Mijoz:</b> ${formData.name}\n`;
+    message += `📞 <b>Tel:</b> ${formData.phone}\n`;
+    message += `🕒 <b>Vaqt:</b> ${date}\n`;
+    message += `📦 <b>Tur:</b> ${typeText}\n`;
+    message += `💰 <b>To'lov:</b> ${paymentText}\n\n`;
+
+    message += `<b>Buyurtma tarkibi:</b>\n`;
+    items.forEach(item => {
+      message += `▫️ ${item.name} x ${item.quantity} = ${formatPrice(item.price * item.quantity)}\n`;
+    });
+    message += `\n<b>Jami: ${formatPrice(totalPrice)}</b>`;
+
+    if (formData.paymentMethod === 'online') {
+      message += `\n\n⏳ <i>To'lov: Online (Tekshirilmoqda)</i>`;
+    }
+
+    const telegramSuccess = await sendTelegramMessage(message);
+
+    if (orderType === 'delivery' && formData.location) {
+      await sendTelegramLocation(formData.location.lat, formData.location.lng);
+    }
+
+    if (telegramSuccess) {
+      toast.success("Buyurtmangiz qabul qilindi! Operator tez orada aloqaga chiqadi.");
+    } else {
+      toast.warning("Buyurtma saqlandi, lekin Telegramga yuborilmadi. Iltimos, admin bilan bog'laning.");
+    }
+
     onClearCart();
     setIsCheckingOut(false);
     setFormData({
@@ -310,7 +346,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
               ) : (
                 <div className="space-y-4">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-4 bg-muted rounded-xl p-4">
+                    <div key={`${item.id}-${item.name}`} className="flex gap-4 bg-muted rounded-xl p-4">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -321,20 +357,20 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
                         <p className="text-gold font-bold">{formatPrice(item.price)}</p>
                         <div className="flex items-center gap-3 mt-2">
                           <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => onUpdateQuantity(item.id, item.name, item.quantity - 1)}
                             className="p-1 bg-card rounded-full hover:bg-background transition-colors"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="font-semibold">{item.quantity}</span>
                           <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => onUpdateQuantity(item.id, item.name, item.quantity + 1)}
                             className="p-1 bg-card rounded-full hover:bg-background transition-colors"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => onRemoveItem(item.id)}
+                            onClick={() => onRemoveItem(item.id, item.name)}
                             className="ml-auto p-1 text-destructive hover:bg-destructive/10 rounded-full transition-colors"
                           >
                             <X className="w-4 h-4" />

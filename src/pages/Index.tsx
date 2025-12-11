@@ -17,28 +17,28 @@ const Index = () => {
 
   const handleAddToCart = (item: MenuItem) => {
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
+      const existingItem = prev.find((i) => i.id === item.id && i.name === item.name);
       if (existingItem) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id && i.name === item.name ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
       return [...prev, { ...item, quantity: 1 }];
     });
   };
 
-  const handleUpdateQuantity = (id: number, quantity: number) => {
+  const handleUpdateQuantity = (id: number, name: string, quantity: number) => {
     if (quantity <= 0) {
-      handleRemoveItem(id);
+      handleRemoveItem(id, name);
       return;
     }
     setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => (item.id === id && item.name === name ? { ...item, quantity } : item))
     );
   };
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleRemoveItem = (id: number, name: string) => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.name === name)));
   };
 
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);

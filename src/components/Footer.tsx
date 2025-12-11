@@ -40,7 +40,7 @@ const Footer = () => {
             <h3 className="font-display text-xl font-bold mb-4">Ijtimoiy tarmoqlar</h3>
             <div className="flex gap-4">
               <a
-                href="https://www.instagram.com/070_aslbe"
+                href="https://instagram.com/070_aslbe"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-12 h-12 bg-cream/10 rounded-full flex items-center justify-center hover:bg-gold transition-colors"
