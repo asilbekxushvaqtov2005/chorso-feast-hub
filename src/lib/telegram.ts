@@ -1,4 +1,4 @@
-const BOT_TOKEN = '8273052137:AAEK-2hvWhS1uxz2mMokSSYAVadlvxN-F_U';
+const BOT_TOKEN = '8053519263:AAFKcTTkHtdLNIodbByikArz2PQ5jLbY4vQ';
 const CHAT_ID = '6850111980';
 
 export const sendTelegramMessage = async (message: string, chatId?: string): Promise<boolean> => {
@@ -7,6 +7,7 @@ export const sendTelegramMessage = async (message: string, chatId?: string): Pro
         console.warn('Telegram credentials not set');
         return false;
     }
+
 
     try {
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
