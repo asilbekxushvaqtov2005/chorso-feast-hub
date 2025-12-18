@@ -10,8 +10,11 @@ CREATE TABLE IF NOT EXISTS orders (
     location_lat DECIMAL(10, 8),
     location_lng DECIMAL(11, 8),
     payment_method VARCHAR(50) DEFAULT 'cash',
+    payment_confirmed BOOLEAN DEFAULT FALSE,
+    courier_id INT,
     status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (courier_id) REFERENCES couriers(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS order_items (

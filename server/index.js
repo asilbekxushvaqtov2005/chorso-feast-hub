@@ -81,6 +81,29 @@ app.put('/api/orders/:id/status', async (req, res) => {
     }
 });
 
+// Assign courier
+app.put('/api/orders/:id/assign', async (req, res) => {
+    const { courierId } = req.body;
+    try {
+        await pool.query('UPDATE orders SET courier_id = ? WHERE id = ?', [courierId, req.params.id]);
+        res.json({ message: 'Courier assigned' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// Confirm payment
+app.put('/api/orders/:id/payment', async (req, res) => {
+    try {
+        await pool.query('UPDATE orders SET payment_confirmed = TRUE WHERE id = ?', [req.params.id]);
+        res.json({ message: 'Payment confirmed' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 // Delete order
 app.delete('/api/orders/:id', async (req, res) => {
     try {
