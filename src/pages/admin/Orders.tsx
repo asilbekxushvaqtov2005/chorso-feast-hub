@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, CreditCard, Banknote, Smartphone, CheckCircle, Search, Filter, MoreHorizontal } from "lucide-react";
+import { MapPin, Phone, CreditCard, Banknote, Smartphone, CheckCircle, Search, Filter, MoreHorizontal, Printer } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
     DropdownMenu,
@@ -34,6 +34,78 @@ const Orders = () => {
         if (window.confirm("Haqiqatan ham bu buyurtmani o'chirmoqchimisiz?")) {
             deleteOrder(id);
         }
+    };
+
+    const handlePrint = (order: any) => {
+        const printWindow = window.open('', '', 'width=400,height=600');
+        if (!printWindow) return;
+
+        const date = new Date(order.date).toLocaleString('uz-UZ');
+
+        const html = `
+            <html>
+            <head>
+                <title>Chek #${order.id.slice(-4)}</title>
+                <style>
+                    body { font-family: 'Courier New', monospace; padding: 20px; max-width: 300px; margin: 0 auto; }
+                    .header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+                    .title { font-size: 24px; font-weight: bold; margin: 0; }
+                    .subtitle { font-size: 14px; margin: 5px 0; }
+                    .info { margin-bottom: 15px; font-size: 14px; }
+                    .items { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
+                    .items th { text-align: left; border-bottom: 1px solid #000; }
+                    .items td { padding: 5px 0; }
+                    .total { text-align: right; font-size: 18px; font-weight: bold; border-top: 1px dashed #000; padding-top: 10px; }
+                    .footer { text-align: center; margin-top: 20px; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1 class="title">CHORSU</h1>
+                    <p class="subtitle">Milliy Taomlar</p>
+                    <p class="subtitle">+998 90 123 45 67</p>
+                </div>
+                <div class="info">
+                    <p><strong>Chek:</strong> #${order.id.slice(-4)}</p>
+                    <p><strong>Sana:</strong> ${date}</p>
+                    <p><strong>Mijoz:</strong> ${order.customerName}</p>
+                    <p><strong>Tel:</strong> ${order.phone}</p>
+                    <p><strong>To'lov:</strong> ${order.paymentMethod === 'card' ? 'Karta' : order.paymentMethod === 'online' ? 'Click/Payme' : 'Naqd'}</p>
+                </div>
+                <table class="items">
+                    <thead>
+                        <tr>
+                            <th>Nomi</th>
+                            <th>Soni</th>
+                            <th style="text-align: right;">Narx</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${order.items.map((item: any) => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}x</td>
+                                <td style="text-align: right;">${(item.price * item.quantity).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="total">
+                    Jami: ${order.total.toLocaleString()} so'm
+                </div>
+                <div class="footer">
+                    <p>Xaridingiz uchun rahmat!</p>
+                    <p>Yoqimli ishtaha!</p>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                </script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(html);
+        printWindow.document.close();
     };
 
     const getStatusBadge = (status: string) => {
@@ -193,6 +265,10 @@ const Orders = () => {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Statusni o'zgartirish</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={() => handlePrint(order)}>
+                                                    <Printer className="w-4 h-4 mr-2" />
+                                                    Chek chiqarish
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => updateOrderStatus(order.id, 'pending')}>
                                                     Kutilmoqda
                                                 </DropdownMenuItem>

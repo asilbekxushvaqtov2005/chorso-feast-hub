@@ -115,7 +115,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
       phone: formData.phone,
       location: formData.location,
       paymentMethod: formData.paymentMethod,
-      items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+      items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, category: i.category })),
       total: totalPrice,
       deliveryType: orderType || 'pickup',
     });

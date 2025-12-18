@@ -26,7 +26,7 @@ export interface Order {
     location: { lat: number; lng: number } | null;
     paymentMethod: 'cash' | 'card' | 'online';
     paymentConfirmed?: boolean;
-    items: { name: string; quantity: number; price: number }[];
+    items: { name: string; quantity: number; price: number; category?: string }[];
     total: number;
     status: 'pending' | 'completed' | 'cancelled';
     date: string;

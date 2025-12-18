@@ -20,11 +20,30 @@ const KitchenOrderCard = ({ order, station, onMarkReady }: KitchenOrderCardProps
             return lowerName.includes('somsa') || lowerName.includes('samsa');
         }
         if (station === 'shashlik') {
-            return lowerName.includes('shashlik');
+            return lowerName.includes('shashlik') ||
+                lowerName.includes('kabob') ||
+                lowerName.includes('jigar') ||
+                lowerName.includes('qiymali');
         }
         if (station === 'main') {
-            // Main kitchen sees everything EXCEPT Somsa and Shashlik
-            return !lowerName.includes('somsa') && !lowerName.includes('samsa') && !lowerName.includes('shashlik');
+            // Main kitchen sees everything EXCEPT Somsa, Shashlik, and Drinks
+            const isDrink = lowerCategory === 'ichimliklar' ||
+                lowerName.includes('cola') ||
+                lowerName.includes('fanta') ||
+                lowerName.includes('pepsi') ||
+                lowerName.includes('suv') ||
+                lowerName.includes('choy') ||
+                lowerName.includes('kofe') ||
+                lowerName.includes('sok') ||
+                lowerName.includes('flash');
+
+            return !lowerName.includes('somsa') &&
+                !lowerName.includes('samsa') &&
+                !lowerName.includes('shashlik') &&
+                !lowerName.includes('kabob') &&
+                !lowerName.includes('jigar') &&
+                !lowerName.includes('qiymali') &&
+                !isDrink;
         }
         return false;
     });

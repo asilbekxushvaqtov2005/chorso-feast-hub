@@ -53,8 +53,8 @@ app.post('/api/orders', async (req, res) => {
 
         for (const item of items) {
             await connection.query(
-                'INSERT INTO order_items (order_id, item_name, quantity, price) VALUES (?, ?, ?, ?)',
-                [orderId, item.name, item.quantity, item.price]
+                'INSERT INTO order_items (order_id, item_name, quantity, price, category) VALUES (?, ?, ?, ?, ?)',
+                [orderId, item.name, item.quantity, item.price, item.category]
             );
         }
 

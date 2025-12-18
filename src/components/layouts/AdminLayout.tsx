@@ -24,6 +24,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import OrderListener from "../admin/OrderListener";
 
 const SidebarLink = ({ to, icon: Icon, label, isActive, onClick }: { to: string, icon: any, label: string, isActive: boolean, onClick?: () => void }) => (
     <Link to={to} onClick={onClick}>
@@ -152,6 +153,7 @@ const AdminLayout = () => {
 
     return (
         <div className="min-h-screen bg-background flex font-body">
+            <OrderListener />
             {/* Desktop Sidebar */}
             <aside className="hidden md:block w-72 fixed h-full z-30">
                 <SidebarContent currentPath={location.pathname} logout={logout} />

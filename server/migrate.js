@@ -39,6 +39,16 @@ async function migrate() {
             console.log('payment_confirmed already exists.');
         }
 
+        // Check for category in order_items
+        const [itemColumns] = await connection.query(`SHOW COLUMNS FROM order_items LIKE 'category'`);
+        if (itemColumns.length === 0) {
+            console.log('Adding category column to order_items...');
+            await connection.query(`ALTER TABLE order_items ADD COLUMN category VARCHAR(50)`);
+            console.log('category added to order_items.');
+        } else {
+            console.log('category already exists in order_items.');
+        }
+
         console.log('Migration completed.');
         connection.release();
         process.exit(0);
