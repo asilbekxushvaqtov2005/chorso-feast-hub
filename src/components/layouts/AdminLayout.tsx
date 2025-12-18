@@ -28,8 +28,8 @@ import {
 const SidebarLink = ({ to, icon: Icon, label, isActive, onClick }: { to: string, icon: any, label: string, isActive: boolean, onClick?: () => void }) => (
     <Link to={to} onClick={onClick}>
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}>
             <Icon className={`w-5 h-5 ${isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
             <span className="font-medium">{label}</span>
@@ -81,6 +81,33 @@ const SidebarContent = ({ currentPath, logout, closeMobileMenu }: { currentPath:
                 isActive={currentPath === "/admin/couriers"}
                 onClick={closeMobileMenu}
             />
+
+            <div className="pt-4 pb-2">
+                <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    Oshxona
+                </p>
+                <SidebarLink
+                    to="/admin/kitchen/main"
+                    icon={UtensilsCrossed}
+                    label="Oshpaz"
+                    isActive={currentPath === "/admin/kitchen/main"}
+                    onClick={closeMobileMenu}
+                />
+                <SidebarLink
+                    to="/admin/kitchen/samsa"
+                    icon={UtensilsCrossed}
+                    label="Somsapaz"
+                    isActive={currentPath === "/admin/kitchen/samsa"}
+                    onClick={closeMobileMenu}
+                />
+                <SidebarLink
+                    to="/admin/kitchen/shashlik"
+                    icon={UtensilsCrossed}
+                    label="Shashlikchi"
+                    isActive={currentPath === "/admin/kitchen/shashlik"}
+                    onClick={closeMobileMenu}
+                />
+            </div>
         </div>
 
         <div className="p-4 border-t border-border">

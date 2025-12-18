@@ -11,6 +11,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import MenuManagement from "./pages/admin/MenuManagement";
 import Couriers from "./pages/admin/Couriers";
 import Orders from "./pages/admin/Orders";
+import KitchenView from "./pages/admin/KitchenView";
 import { AdminProvider } from "./context/AdminContext";
 import { OrderProvider } from "./context/OrderContext";
 import { CustomerAuthProvider } from "./context/CustomerAuthContext";
@@ -42,6 +43,9 @@ const App = () => (
                   <Route path="menu" element={<MenuManagement />} />
                   <Route path="couriers" element={<Couriers />} />
                   <Route path="orders" element={<Orders />} />
+                  <Route path="kitchen/main" element={<KitchenView station="main" title="Oshpaz Ekrani" />} />
+                  <Route path="kitchen/samsa" element={<KitchenView station="samsa" title="Somsapaz Ekrani" />} />
+                  <Route path="kitchen/shashlik" element={<KitchenView station="shashlik" title="Shashlikchi Ekrani" />} />
                 </Route>
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
