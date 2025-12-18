@@ -13,6 +13,10 @@ import Couriers from "./pages/admin/Couriers";
 import Orders from "./pages/admin/Orders";
 import { AdminProvider } from "./context/AdminContext";
 import { OrderProvider } from "./context/OrderContext";
+import { CustomerAuthProvider } from "./context/CustomerAuthContext";
+import CustomerLogin from "./pages/auth/Login";
+import CustomerVerify from "./pages/auth/Verify";
+import Profile from "./pages/auth/Profile";
 
 const queryClient = new QueryClient();
 
@@ -20,27 +24,32 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AdminProvider>
       <OrderProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
+        <CustomerAuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<CustomerLogin />} />
+                <Route path="/verify" element={<CustomerVerify />} />
+                <Route path="/profile" element={<Profile />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="menu" element={<MenuManagement />} />
-                <Route path="couriers" element={<Couriers />} />
-                <Route path="orders" element={<Orders />} />
-              </Route>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="menu" element={<MenuManagement />} />
+                  <Route path="couriers" element={<Couriers />} />
+                  <Route path="orders" element={<Orders />} />
+                </Route>
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CustomerAuthProvider>
       </OrderProvider>
     </AdminProvider>
   </QueryClientProvider>
