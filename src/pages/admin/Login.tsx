@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Button } from "@/components/ui/button";
@@ -12,16 +12,19 @@ const AdminLogin = () => {
     const navigate = useNavigate();
 
     // Redirect if already logged in
-    if (isAuthenticated) {
-        navigate("/admin");
-        return null;
-    }
+    useEffect(() => {
+        if (isAuthenticated) {
+            // Use replace to prevent back button issues
+            window.location.replace("/admin");
+        }
+    }, [isAuthenticated]);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (login(password)) {
             toast.success("Welcome back, Admin!");
-            navigate("/admin");
+            // Force reload to ensure state persistence
+            window.location.href = "/admin";
         } else {
             toast.error("Invalid password");
         }

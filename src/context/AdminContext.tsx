@@ -1,39 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { menuItems as initialMenuData } from '../data/menuData';
 import { sendTelegramMessage, sendTelegramLocation } from '../lib/telegram';
-
-// Define types
-export interface MenuItem {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    image: string;
-    category: string;
-}
-
-export interface Courier {
-    id: string;
-    name: string;
-    phone: string;
-    telegramChatId?: string;
-    status: 'active' | 'inactive';
-}
-
-export interface Order {
-    id: string;
-    customerName: string; // Keeping for backward compatibility, can be used for name input if needed
-    phone: string;
-    location: { lat: number; lng: number } | null;
-    paymentMethod: 'cash' | 'card' | 'online';
-    paymentConfirmed?: boolean; // For online payments
-    items: { name: string; quantity: number; price: number }[];
-    total: number;
-    status: 'pending' | 'completed' | 'cancelled';
-    date: string;
-    courierId?: string;
-    deliveryType: 'pickup' | 'delivery';
-}
+import { MenuItem, Order, Courier } from '../types/admin';
 
 interface AdminContextType {
     menuItems: MenuItem[];
@@ -45,86 +13,119 @@ interface AdminContextType {
     addMenuItem: (item: Omit<MenuItem, 'id'>) => void;
     updateMenuItem: (item: MenuItem) => void;
     deleteMenuItem: (id: number) => void;
+    deleteOrder: (id: string) => void;
     updateOrderStatus: (id: string, status: Order['status']) => void;
     addOrder: (order: Omit<Order, 'id' | 'date' | 'status' | 'paymentConfirmed'>) => Promise<void>;
     addCourier: (courier: Omit<Courier, 'id' | 'status'>) => void;
     deleteCourier: (id: string) => void;
-    assignCourier: (orderId: string, courierId: string) => void;
+    assignCourier: (orderId: string, courierId: string) => Promise<void>;
     confirmPayment: (orderId: string) => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
+        const storedMenu = localStorage.getItem('offlineMenu');
+        if (storedMenu) {
+            try {
+                const parsedMenu = JSON.parse(storedMenu);
+                if (Array.isArray(parsedMenu)) {
+                    return parsedMenu;
+                }
+            } catch (e) {
+                console.error("Failed to parse offline menu:", e);
+                localStorage.removeItem('offlineMenu');
+            }
+        }
+        return initialMenuData;
+    });
+
     const [orders, setOrders] = useState<Order[]>([]);
     const [couriers, setCouriers] = useState<Courier[]>([]);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return localStorage.getItem('adminAuth') === 'true';
+    });
 
     // Load data from localStorage on mount
     useEffect(() => {
-        const storedMenu = localStorage.getItem('menuItems_v5');
-        const storedOrders = localStorage.getItem('orders');
-        const storedCouriers = localStorage.getItem('couriers');
-        const storedAuth = localStorage.getItem('isAuthenticated');
-
-        if (storedMenu) {
-            setMenuItems(JSON.parse(storedMenu));
-        } else {
-            setMenuItems(initialMenuData);
-        }
-
+        // Load orders
+        const storedOrders = localStorage.getItem('offlineOrders');
         if (storedOrders) {
-            setOrders(JSON.parse(storedOrders));
-        } else {
-            // Mock orders for demonstration
-            setOrders([
-                {
-                    id: '1',
-                    customerName: 'John Doe',
-                    phone: '+998901234567',
-                    location: null,
-                    paymentMethod: 'cash',
-                    items: [{ name: 'Osh', quantity: 2, price: 45000 }],
-                    total: 90000,
-                    status: 'pending',
-                    date: new Date().toISOString(),
-                    deliveryType: 'delivery',
-                },
-            ]);
+            try {
+                const parsedOrders = JSON.parse(storedOrders);
+                if (Array.isArray(parsedOrders)) {
+                    setOrders(parsedOrders);
+                }
+            } catch (e) {
+                console.error("Failed to parse offline orders:", e);
+                localStorage.removeItem('offlineOrders');
+            }
         }
 
+        // Load couriers (mock persistence for now)
+        const storedCouriers = localStorage.getItem('offlineCouriers');
         if (storedCouriers) {
-            setCouriers(JSON.parse(storedCouriers));
-        }
-
-        if (storedAuth === 'true') {
-            setIsAuthenticated(true);
+            try {
+                const parsedCouriers = JSON.parse(storedCouriers);
+                if (Array.isArray(parsedCouriers)) {
+                    setCouriers(parsedCouriers);
+                }
+            } catch (e) {
+                console.error("Failed to parse offline couriers:", e);
+                localStorage.removeItem('offlineCouriers');
+            }
         }
     }, []);
 
-    // Save to localStorage whenever state changes
+    // Listen for changes in other tabs
     useEffect(() => {
-        if (menuItems.length > 0) {
-            localStorage.setItem('menuItems_v5', JSON.stringify(menuItems));
-        }
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'offlineMenu' && e.newValue) {
+                try {
+                    const parsedMenu = JSON.parse(e.newValue);
+                    if (Array.isArray(parsedMenu)) {
+                        setMenuItems(parsedMenu);
+                    }
+                } catch (error) {
+                    console.error("Failed to sync menu from storage event:", error);
+                }
+            }
+            if (e.key === 'offlineOrders' && e.newValue) {
+                try {
+                    const parsedOrders = JSON.parse(e.newValue);
+                    if (Array.isArray(parsedOrders)) {
+                        setOrders(parsedOrders);
+                    }
+                } catch (error) {
+                    console.error("Failed to sync orders from storage event:", error);
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    // Save menu items to localStorage
+    useEffect(() => {
+        localStorage.setItem('offlineMenu', JSON.stringify(menuItems));
     }, [menuItems]);
 
+    // Save orders to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('orders', JSON.stringify(orders));
+        localStorage.setItem('offlineOrders', JSON.stringify(orders));
     }, [orders]);
 
+    // Save couriers to localStorage
     useEffect(() => {
-        localStorage.setItem('couriers', JSON.stringify(couriers));
+        localStorage.setItem('offlineCouriers', JSON.stringify(couriers));
     }, [couriers]);
-
-    useEffect(() => {
-        localStorage.setItem('isAuthenticated', String(isAuthenticated));
-    }, [isAuthenticated]);
 
     const login = (password: string) => {
         if (password === 'admin123') {
             setIsAuthenticated(true);
+            localStorage.setItem('adminAuth', 'true');
             return true;
         }
         return false;
@@ -132,6 +133,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const logout = () => {
         setIsAuthenticated(false);
+        localStorage.removeItem('adminAuth');
     };
 
     const addMenuItem = (item: Omit<MenuItem, 'id'>) => {
@@ -151,73 +153,31 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setOrders(orders.map((order) => (order.id === id ? { ...order, status } : order)));
     };
 
+    const deleteOrder = (id: string) => {
+        setOrders(orders.filter((order) => order.id !== id));
+    };
+
     const addOrder = async (orderData: Omit<Order, 'id' | 'date' | 'status' | 'paymentConfirmed'>) => {
-        let assignedCourierId: string | undefined = undefined;
-
-        // Auto-assign courier for delivery orders
-        if (orderData.deliveryType === 'delivery') {
-            const activeCouriers = couriers.filter(c => c.status === 'active');
-
-            if (activeCouriers.length > 0) {
-                // Find courier with least pending orders
-                const courierOrderCounts = activeCouriers.map(courier => ({
-                    courierId: courier.id,
-                    count: orders.filter(o => o.courierId === courier.id && o.status === 'pending').length
-                }));
-
-                courierOrderCounts.sort((a, b) => a.count - b.count);
-                assignedCourierId = courierOrderCounts[0].courierId;
-            }
-        }
-
         const newOrder: Order = {
             ...orderData,
             id: Date.now().toString(),
             date: new Date().toISOString(),
             status: 'pending',
-            paymentConfirmed: orderData.paymentMethod !== 'online', // Auto-confirm for cash/card
-            courierId: assignedCourierId,
+            paymentConfirmed: orderData.paymentMethod === 'online' ? false : undefined
         };
-
-        // Notify assigned courier
-        if (assignedCourierId) {
-            const courier = couriers.find(c => c.id === assignedCourierId);
-            if (courier && courier.telegramChatId) {
-                let itemsList = "";
-                newOrder.items.forEach(item => {
-                    itemsList += `▫️ ${item.quantity}x ${item.name}\n`;
-                });
-
-                const message = `📦 <b>Yangi buyurtma sizga biriktirildi!</b>\n\n` +
-                    `🆔 Buyurtma: #${newOrder.id.slice(-4)}\n` +
-                    `👤 Mijoz: ${newOrder.customerName}\n` +
-                    `📞 Tel: ${newOrder.phone}\n` +
-                    `💰 Jami: ${newOrder.total.toLocaleString()} UZS\n` +
-                    `📍 Manzil: ${newOrder.location ? 'Xarita pastda' : 'Belgilanmagan'}\n\n` +
-                    `<b>Buyurtma tarkibi:</b>\n${itemsList}`;
-
-                // Send message asynchronously without blocking UI significantly, but we await it to ensure it's sent
-                try {
-                    await sendTelegramMessage(message, courier.telegramChatId);
-                    if (newOrder.location) {
-                        await sendTelegramLocation(newOrder.location.lat, newOrder.location.lng, courier.telegramChatId);
-                    }
-                } catch (error) {
-                    console.error("Failed to send auto-assignment notification:", error);
-                }
-            }
-        }
-
         setOrders((prev) => [newOrder, ...prev]);
+
+        // Telegram notification logic can go here if needed client-side
+        // sendTelegramMessage(...)
     };
 
     const addCourier = (courierData: Omit<Courier, 'id' | 'status'>) => {
         const newCourier: Courier = {
             ...courierData,
             id: Date.now().toString(),
-            status: 'active',
+            status: 'active'
         };
-        setCouriers((prev) => [...prev, newCourier]);
+        setCouriers([...couriers, newCourier]);
     };
 
     const deleteCourier = (id: string) => {
@@ -225,22 +185,36 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     const assignCourier = async (orderId: string, courierId: string) => {
+        setOrders((prev) =>
+            prev.map((order) =>
+                order.id === orderId ? { ...order, courierId } : order
+            )
+        );
+
+        if (courierId === 'unassigned') return;
+
         const courier = couriers.find(c => c.id === courierId);
         const order = orders.find(o => o.id === orderId);
 
-        if (courier && order && courier.telegramChatId) {
-            let itemsList = "";
-            order.items.forEach(item => {
-                itemsList += `▫️ ${item.quantity}x ${item.name}\n`;
-            });
+        if (courier && courier.telegramChatId && order) {
+            const date = new Date(order.date).toLocaleString('uz-UZ');
+            let message = `<b>🆕 Yangi Buyurtma!</b>\n\n`;
+            message += `🆔 <b>ID:</b> #${order.id.slice(-4)}\n`;
+            message += `👤 <b>Mijoz:</b> ${order.customerName}\n`;
+            message += `📞 <b>Tel:</b> ${order.phone}\n`;
+            message += `📍 <b>Manzil:</b> ${order.location ? 'Lokatsiya' : 'Olib ketish'}\n`;
+            message += `💰 <b>Jami:</b> ${order.total.toLocaleString()} so'm\n`;
 
-            const message = `📦 <b>Yangi buyurtma sizga biriktirildi!</b>\n\n` +
-                `🆔 Buyurtma: #${order.id.slice(-4)}\n` +
-                `👤 Mijoz: ${order.customerName}\n` +
-                `📞 Tel: ${order.phone}\n` +
-                `💰 Jami: ${order.total.toLocaleString()} UZS\n` +
-                `📍 Manzil: ${order.location ? 'Xarita pastda' : 'Belgilanmagan'}\n\n` +
-                `<b>Buyurtma tarkibi:</b>\n${itemsList}`;
+            if (order.paymentMethod === 'online') {
+                message += `💳 <b>To'lov:</b> Online ${order.paymentConfirmed ? '✅' : '⏳'}\n`;
+            } else {
+                message += `💵 <b>To'lov:</b> ${order.paymentMethod === 'card' ? 'Karta' : 'Naqd'}\n`;
+            }
+
+            message += `\n<b>Buyurtma tarkibi:</b>\n`;
+            order.items.forEach(item => {
+                message += `▫️ ${item.name} x ${item.quantity}\n`;
+            });
 
             await sendTelegramMessage(message, courier.telegramChatId);
 
@@ -248,20 +222,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 await sendTelegramLocation(order.location.lat, order.location.lng, courier.telegramChatId);
             }
         }
-
-        setOrders((prev) =>
-            prev.map((order) =>
-                order.id === orderId ? { ...order, courierId } : order
-            )
-        );
     };
 
-    const confirmPayment = async (orderId: string) => {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-            await sendTelegramMessage(`✅ <b>Buyurtma #${order.id.slice(-4)} to'lovi tasdiqlandi!</b>\n\nTo'lov turi: Online`);
-        }
-
+    const confirmPayment = (orderId: string) => {
         setOrders((prev) =>
             prev.map((order) =>
                 order.id === orderId ? { ...order, paymentConfirmed: true } : order
@@ -281,6 +244,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 addMenuItem,
                 updateMenuItem,
                 deleteMenuItem,
+                deleteOrder,
                 updateOrderStatus,
                 addOrder,
                 addCourier,

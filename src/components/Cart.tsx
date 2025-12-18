@@ -58,8 +58,31 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
         },
         (error) => {
           setLoadingLocation(false);
-          console.error(error);
-          toast.error("Joylashuvni aniqlab bo'lmadi. Iltimos, ruxsat bering.");
+          console.error("Geolocation error:", error);
+          let errorMessage = "Joylashuvni aniqlab bo'lmadi.";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Joylashuvga ruxsat berilmadi. Sozlamalarni tekshiring.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Joylashuv ma'lumotlari mavjud emas.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Vaqt tugadi. Iltimos, GPS yoniqligini tekshiring va qayta urining.";
+              break;
+            default:
+              errorMessage = "Noma'lum xatolik yuz berdi.";
+          }
+          // Check if error is due to insecure origin
+          if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            errorMessage += " (Diqqat: Joylashuv faqat HTTPS yoki localhost da ishlaydi)";
+          }
+          toast.error(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 30000,
+          maximumAge: 0
         }
       );
     } else {

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import heroBg from "@/assets/hero-bg.jpg";
 import { ChefHat } from "lucide-react";
 
 const Hero = () => {
@@ -10,9 +9,9 @@ const Hero = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBg})` }}
+        style={{ backgroundImage: `url('/assets/hero-bg.jpg')` }}
       >
         <div className="absolute inset-0 bg-hero-gradient opacity-85" />
       </div>
@@ -26,14 +25,14 @@ const Hero = () => {
               An'anaviy Ta'mlar
             </span>
           </div>
-          
+
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-cream font-bold mb-6 leading-tight">
             Chorsu
             <span className="block text-gold">Restoran</span>
           </h1>
-          
+
           <p className="text-cream/90 text-lg md:text-xl max-w-2xl mx-auto mb-10 font-body leading-relaxed">
-            O'zbek milliy taomlari bilan tanishing. Bizning oshxonamizda tayyorlangan 
+            O'zbek milliy taomlari bilan tanishing. Bizning oshxonamizda tayyorlangan
             an'anaviy retseptlar sizni hayratda qoldiradi.
           </p>
 

@@ -63,6 +63,13 @@ export default {
           DEFAULT: "hsl(var(--cream))",
           dark: "hsl(var(--cream-dark))",
         },
+        admin: {
+          bg: "#1a1f37",
+          card: "#202642", // Slightly lighter than bg
+          accent: "#ff4b5c", // Pink/Red accent
+          text: "#ffffff",
+          muted: "#a0aec0",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

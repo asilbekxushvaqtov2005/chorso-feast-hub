@@ -1,16 +1,16 @@
-import plovImg from "@/assets/plov.jpg";
-import samsaImg from "@/assets/samsa.jpg";
-import shashlikImg from "@/assets/shashlik.jpg";
-import lagmanImg from "@/assets/lagman.jpg";
-import mantiImg from "@/assets/manti.jpg";
-import chorsuImg from "@/assets/chorsu.jpg";
-import cocaColaImg from "@/assets/coca_cola.png";
-import pepsiImg from "@/assets/pepsi.png";
-import flashImg from "@/assets/flash.png";
-import chortoqImg from "@/assets/chortoq.png";
-import juiceImg from "@/assets/juice.png";
-import waterImg from "@/assets/water.png";
-import fantaImg from "@/assets/fanta.jpg"; // Keep fanta as fallback or specific fanta image if available
+const plovImg = "/assets/plov.jpg";
+const samsaImg = "/assets/samsa.jpg";
+const shashlikImg = "/assets/shashlik.jpg";
+const lagmanImg = "/assets/lagman.jpg";
+const mantiImg = "/assets/manti.jpg";
+const chorsuImg = "/assets/chorsu.jpg";
+const cocaColaImg = "/assets/coca_cola.png";
+const pepsiImg = "/assets/pepsi.png";
+const flashImg = "/assets/flash.png";
+const chortoqImg = "/assets/chortoq.png";
+const juiceImg = "/assets/juice.png";
+const waterImg = "/assets/water.png";
+const fantaImg = "/assets/fanta.jpg";
 
 export interface MenuItem {
   id: number;
