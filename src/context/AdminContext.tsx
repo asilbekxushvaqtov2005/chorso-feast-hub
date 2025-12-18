@@ -69,9 +69,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
 
         // Orders Listener
-        const q = query(collection(db, "orders"), orderBy("date", "desc"));
-        const unsubscribeOrders = onSnapshot(q, (snapshot) => {
+        // const q = query(collection(db, "orders"), orderBy("date", "desc"));
+        const unsubscribeOrders = onSnapshot(collection(db, "orders"), (snapshot) => {
             const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+            // Sort manually on client side to avoid index issues
+            ordersData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
             setOrders(ordersData);
         }, (error) => {
             console.error("Orders listener error:", error);
