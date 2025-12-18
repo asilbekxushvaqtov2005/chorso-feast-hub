@@ -73,12 +73,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const unsubscribeOrders = onSnapshot(q, (snapshot) => {
             const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
             setOrders(ordersData);
+        }, (error) => {
+            console.error("Orders listener error:", error);
+            alert("Kompyuterda buyurtmalarni o'qishda xatolik: " + error.message);
         });
 
         // Couriers Listener
         const unsubscribeCouriers = onSnapshot(collection(db, "couriers"), (snapshot) => {
             const couriersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Courier));
             setCouriers(couriersData);
+        }, (error) => {
+            console.error("Couriers listener error:", error);
         });
 
         return () => {
