@@ -9,6 +9,7 @@ import {
     updateDoc,
     deleteDoc,
     doc,
+    setDoc,
     onSnapshot,
     query,
     orderBy,
@@ -47,14 +48,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Real-time listeners
     useEffect(() => {
         // Menu Listener
-        const unsubscribeMenu = onSnapshot(collection(db, "menu"), (snapshot) => {
+        const unsubscribeMenu = onSnapshot(collection(db, "menu"), async (snapshot) => {
             const menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-            // If menu is empty in DB, load initial data (one-time migration logic could go here)
+
+            // If menu is empty in DB, seed it with initial data
             if (menuData.length === 0 && initialMenuData.length > 0) {
-                // Optional: Seed DB if empty. For now, just set state.
-                // setMenuItems(initialMenuData); 
+                console.log("Seeding database with initial menu...");
+                for (const item of initialMenuData) {
+                    try {
+                        // Use item.id as doc ID to prevent duplicates if run multiple times
+                        await setDoc(doc(db, "menu", item.id.toString()), item);
+                    } catch (e) {
+                        console.error("Error seeding item:", item.name, e);
+                    }
+                }
+                // No need to setMenuItems here, the snapshot listener will fire again
+            } else {
+                setMenuItems(menuData);
             }
-            setMenuItems(menuData.length > 0 ? menuData : initialMenuData);
         });
 
         // Orders Listener
