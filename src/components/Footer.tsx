@@ -59,6 +59,28 @@ const Footer = () => {
 
         <div className="border-t border-cream/20 mt-12 pt-8 text-center text-cream/60">
           <p>© 2024 Chorsu Restoran. Barcha huquqlar himoyalangan.</p>
+          <button
+            className="opacity-10 hover:opacity-100 mt-4 text-xs"
+            onClick={async () => {
+              try {
+                const { collection, addDoc, deleteDoc, doc } = await import('firebase/firestore');
+                const { db } = await import('@/lib/firebase');
+                const testRef = await addDoc(collection(db, "test_connection"), {
+                  timestamp: new Date().toISOString(),
+                  device: navigator.userAgent,
+                  client: true
+                });
+                alert("✅ Client: Yozish muvaffaqiyatli! ID: " + testRef.id);
+                await deleteDoc(doc(db, "test_connection", testRef.id));
+                alert("✅ Client: O'qish va o'chirish muvaffaqiyatli!");
+              } catch (e: any) {
+                alert("❌ Client Xatolik: " + e.message);
+                console.error(e);
+              }
+            }}
+          >
+            System Check
+          </button>
         </div>
       </div>
     </footer>

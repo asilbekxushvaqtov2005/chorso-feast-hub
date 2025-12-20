@@ -147,6 +147,27 @@ const Orders = () => {
                     >
                         🔄 Yangilash
                     </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={async () => {
+                            try {
+                                const { collection, addDoc, deleteDoc, doc } = await import('firebase/firestore');
+                                const { db } = await import('@/lib/firebase');
+                                const testRef = await addDoc(collection(db, "test_connection"), {
+                                    timestamp: new Date().toISOString(),
+                                    device: navigator.userAgent
+                                });
+                                alert("✅ Yozish muvaffaqiyatli! ID: " + testRef.id);
+                                await deleteDoc(doc(db, "test_connection", testRef.id));
+                                alert("✅ O'qish va o'chirish muvaffaqiyatli! Aloqa a'lo darajada.");
+                            } catch (e: any) {
+                                alert("❌ Xatolik: " + e.message);
+                                console.error(e);
+                            }
+                        }}
+                    >
+                        📡 Test
+                    </Button>
                 </div>
             </div>
 
