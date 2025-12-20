@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Orders = () => {
-    const { orders, couriers, updateOrderStatus, assignCourier, confirmPayment, deleteOrder } = useAdmin();
+    const { orders, couriers, updateOrderStatus, assignCourier, confirmPayment, deleteOrder, refreshOrders } = useAdmin();
 
     const handleDelete = (id: string) => {
         if (window.confirm("Haqiqatan ham bu buyurtmani o'chirmoqchimisiz?")) {
@@ -139,6 +139,13 @@ const Orders = () => {
                     <Button variant="outline" className="bg-card">
                         <Filter className="w-4 h-4 mr-2" />
                         Filter
+                    </Button>
+                    <Button
+                        variant="default"
+                        onClick={() => refreshOrders()}
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                        🔄 Yangilash
                     </Button>
                 </div>
             </div>

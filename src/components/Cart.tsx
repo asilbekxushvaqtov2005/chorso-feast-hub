@@ -43,6 +43,8 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
 
   const handleLocation = () => {
     setLoadingLocation(true);
+    toast.info("Joylashuv aniqlanmoqda, iltimos kuting...");
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -68,7 +70,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
               errorMessage = "Joylashuv ma'lumotlari mavjud emas.";
               break;
             case error.TIMEOUT:
-              errorMessage = "Vaqt tugadi. Iltimos, GPS yoniqligini tekshiring va qayta urining.";
+              errorMessage = "Vaqt tugadi. Qayta urinib ko'ring.";
               break;
             default:
               errorMessage = "Noma'lum xatolik yuz berdi.";
@@ -81,8 +83,8 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
         },
         {
           enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 0
+          timeout: 10000, // Reduced to 10s
+          maximumAge: 10000 // Allow cached position from last 10s
         }
       );
     } else {

@@ -13,7 +13,8 @@ import {
     onSnapshot,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    getDocs
 } from 'firebase/firestore';
 
 interface AdminContextType {
@@ -33,6 +34,7 @@ interface AdminContextType {
     deleteCourier: (id: string) => Promise<void>;
     assignCourier: (orderId: string, courierId: string) => Promise<void>;
     confirmPayment: (orderId: string) => Promise<void>;
+    refreshOrders: () => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -252,6 +254,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 deleteCourier,
                 assignCourier,
                 confirmPayment,
+                refreshOrders: async () => {
+                    try {
+                        const snapshot = await getDocs(collection(db, "orders"));
+                        const ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+                        ordersData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                        setOrders(ordersData);
+                        alert("Buyurtmalar yangilandi! Jami: " + ordersData.length);
+                    } catch (error: any) {
+                        console.error("Manual refresh error:", error);
+                        alert("Yangilashda xatolik: " + error.message);
+                    }
+                }
             }}
         >
             {children}
