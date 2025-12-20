@@ -163,6 +163,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             await addDoc(collection(db, "orders"), newOrder);
         } catch (e) {
             console.error("Error adding order: ", e);
+            throw e; // Re-throw to handle in UI
         }
     };
 

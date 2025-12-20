@@ -110,15 +110,21 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, onClearC
     }
 
     // 1. Save to local Admin Context (for local admin panel)
-    addOrder({
-      customerName: formData.name,
-      phone: formData.phone,
-      location: formData.location,
-      paymentMethod: formData.paymentMethod,
-      items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, category: i.category })),
-      total: totalPrice,
-      deliveryType: orderType || 'pickup',
-    });
+    try {
+      await addOrder({
+        customerName: formData.name,
+        phone: formData.phone,
+        location: formData.location,
+        paymentMethod: formData.paymentMethod,
+        items: items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, category: i.category })),
+        total: totalPrice,
+        deliveryType: orderType || 'pickup',
+      });
+    } catch (error: any) {
+      console.error("Order save error:", error);
+      toast.error("Buyurtmani saqlashda xatolik: " + error.message);
+      return; // Stop if save fails
+    }
 
     // 2. Send to Telegram
     const orderId = Date.now().toString().slice(-4);
